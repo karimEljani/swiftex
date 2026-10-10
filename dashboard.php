@@ -1,0 +1,3 @@
+<?php require 'config.php';need();$s=db()->prepare('SELECT * FROM shipments WHERE user_id=? ORDER BY id DESC');$s->execute([$_SESSION['u']['id']]);$r=$s->fetchAll();head('Dashboard');?>
+<div class="wrap"><h1>Hello, <?=e($_SESSION['u']['name'])?></h1><p><a class="btn" href="ship.php">Create Shipment</a> <a class="btn ghost" href="logout.php">Sign Out</a></p><h2>Shipment history</h2>
+<table><tr><th>Tracking</th><th>Route</th><th>Status</th><th>ETA</th><th>Price</th></tr><?php foreach($r as $x)echo '<tr><td><a href="shipment.php?id='.$x['id'].'">'.e($x['tracking']).'</a></td><td>'.e($x['origin']).' → '.e($x['dest']).'</td><td>'.STAGES[$x['status']].'</td><td>'.e($x['eta']).'</td><td>$'.e($x['price']).'</td></tr>';?></table></div><?php foot();

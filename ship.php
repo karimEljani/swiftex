@@ -1,0 +1,7 @@
+<?php require 'config.php';need();$err='';
+if($_SERVER['REQUEST_METHOD']=='POST'){$o=trim($_POST['o']);$d=trim($_POST['d']);$w=(float)$_POST['w'];$s=$_POST['s'];
+if(!$o||!$d||$w<=0||!isset(SPEEDS[$s]))$err='Please complete all fields.';else{$q=quote($o,$d,$w,$s);$tn='SWX'.random_int(1000,9999).random_int(1000,9999).random_int(100,999);
+db()->prepare('INSERT INTO shipments(user_id,tracking,origin,dest,type,weight,speed,price,status,location,eta,updated) VALUES(?,?,?,?,?,?,?,?,0,?,?,NOW())')->execute([$_SESSION['u']['id'],$tn,$o,$d,$_POST['t'],$w,$s,$q['price'],$o,date('Y-m-d',strtotime($q['eta']))]);
+$id=db()->lastInsertId();db()->prepare("INSERT INTO events(shipment_id,label,at) VALUES(?,'Shipment Created',NOW())")->execute([$id]);header("Location: shipment.php?id=$id");exit;}}
+head('Ship');?><div class="wrap"><h1>Create Shipment</h1><form method="post" class="box" data-v><p class="err"><?=e($err)?></p>
+<label>Origin</label><input name="o" required><label>Destination</label><input name="d" required><label>Package type</label><select name="t"><option>Document</option><option>Parcel</option><option>Pallet</option></select><label>Weight (kg)</label><input name="w" type="number" step="0.1" required><label>Delivery speed</label><select name="s"><?php foreach(SPEEDS as $k=>$v)echo "<option value='$k'>$v[0]</option>";?></select><br><button class="btn">Create Shipment</button></form></div><?php foot();

@@ -1,0 +1,6 @@
+<?php require 'config.php';need();$s=db()->prepare('SELECT * FROM shipments WHERE id=? AND user_id=?');$s->execute([(int)$_GET['id'],$_SESSION['u']['id']]);$x=$s->fetch();if(!$x){http_response_code(404);exit('Not found');}
+if(isset($_POST['adv'])&&$x['status']<5){$n=$x['status']+1;db()->prepare('UPDATE shipments SET status=?,updated=NOW() WHERE id=?')->execute([$n,$x['id']]);db()->prepare('INSERT INTO events(shipment_id,label,at) VALUES(?,?,NOW())')->execute([$x['id'],STAGES[$n]]);header('Location: shipment.php?id='.$x['id']);exit;}
+$ev=db()->prepare('SELECT * FROM events WHERE shipment_id=? ORDER BY at DESC');$ev->execute([$x['id']]);head('Shipment Details');?>
+<div class="wrap"><h1>Shipment <?=e($x['tracking'])?></h1><?php timeline($x['status'])?><div class="grid"><div><b>From</b><br><?=e($x['origin'])?></div><div><b>To</b><br><?=e($x['dest'])?></div><div><b>Weight</b><br><?=e($x['weight'])?> kg · <?=e($x['type'])?></div><div><b>Price</b><br>$<?=e($x['price'])?></div><div><b>ETA</b><br><?=e($x['eta'])?></div></div>
+<h3>Status notifications</h3><?php foreach($ev as $e)echo '<div class="note">🔔 '.e($e['at']).' — '.e($e['label']).'</div>';?>
+<?php if($x['status']<5):?><form method="post"><button name="adv" class="btn ghost">Simulate next status</button></form><?php endif;?></div><?php foot();

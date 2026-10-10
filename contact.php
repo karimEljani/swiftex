@@ -1,0 +1,2 @@
+<?php require 'config.php';$ok=0;if($_SERVER['REQUEST_METHOD']=='POST'&&filter_var($_POST['email'],FILTER_VALIDATE_EMAIL)&&trim($_POST['msg'])){$ok=1;/* mail() ici */}head('Contact');?>
+<div class="wrap"><h1>Contact</h1><form method="post" class="box" data-v><?=$ok?'<div class="ok">Message sent. We will reply within 24h.</div>':''?><label>Name</label><input name="name" required><label>Email</label><input type="email" name="email" required><label>Message</label><textarea name="msg" rows="5" required></textarea><br><button class="btn">Send</button></form></div><?php foot();
